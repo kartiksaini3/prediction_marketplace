@@ -1,0 +1,26 @@
+services:
+  # Local Hardhat Node
+  blockchain:
+    image: node:20-alpine
+    working_dir: /app
+    ports:
+      - "8545:8545"
+    volumes:
+      - .:/app
+    command: sh -c "npm install --legacy-peer-deps && npx hardhat node --hostname 0.0.0.0"
+
+  # Next.js Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
+        - NEXT_PUBLIC_HARDHAT_CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
+        - NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=demo-project-id
+    ports:
+      - "3000:3000"
+    depends_on:
+      - blockchain
+    environment:
+      - NODE_ENV=production
