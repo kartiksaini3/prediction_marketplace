@@ -6,6 +6,7 @@ import {
   useDisconnect,
   useChainId,
   useSwitchChain,
+  useBalance,
 } from "wagmi";
 import { useState } from "react";
 import {
@@ -23,6 +24,12 @@ export default function WalletConnect() {
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
+  const { data: balance } = useBalance({
+    address,
+    query: {
+      refetchInterval: 5000, // Refresh every 5s
+    },
+  });
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNetworkDropdown, setShowNetworkDropdown] = useState(false);
   const [isFunding, setIsFunding] = useState(false);
@@ -166,7 +173,12 @@ export default function WalletConnect() {
         </div>
 
         {/* Wallet Connection */}
-        <div className="relative">
+        <div className="relative flex items-center gap-2">
+          {balance && (
+            <div className="glass px-3 py-2 rounded-xl text-sm font-semibold text-primary/90">
+              {Number(balance.formatted).toFixed(4)} {balance.symbol}
+            </div>
+          )}
           <button
             onClick={() => setShowDropdown(!showDropdown)}
             className="glass-strong px-4 py-2 rounded-xl font-semibold text-sm hover:bg-opacity-20 transition-all flex items-center gap-2"
